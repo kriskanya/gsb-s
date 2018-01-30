@@ -8,9 +8,10 @@ class EventsController < ApplicationController
   end
 
   def scrape
-    event = Event.new()
     if (params[:states])
-      event.start(params[:states])
+      event = Event.new()
+      gun_shows_array = event.start(params[:states])
+      event.create_records(gun_shows_array)
     end
     redirect_to events_path
   end

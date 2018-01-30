@@ -7,18 +7,22 @@ class Event < ApplicationRecord
   end
 
   def scrape(states_selected)
-    @gun_show_data = []
+    gun_show_data = []
     get_all_gunshow_titles(states_selected).each do |gun_show_title|
-      @gun_show_data << get_individual_gun_show_data(gun_show_title)
+      new_record = get_individual_gun_show_data(gun_show_title)
+      if (gun_show_data.select { |d| d[:title] == new_record[:title] && d[:location] == new_record[:location] }.length == 0)
+        gun_show_data << new_record
+      end
       sleep 1
     end 
-    puts @gun_show_data
+    return gun_show_data
   end
 
   def get_all_gunshow_titles(states_selected)
     require 'open-uri'
     gun_show_titles = []
     states_selected.each do |us_state|
+      @current_state = us_state
       doc = Nokogiri::HTML(open("https://gunshowtrader.com/gunshows/#{us_state}/").read)
       doc.css('a.event-link').each do |item|
         gun_show_titles << item.attr('href').split('gun-shows/')[1].gsub('/', '')
@@ -37,17 +41,19 @@ class Event < ApplicationRecord
       rating: get_rating(doc),
       city: get_city(doc),
       state: get_state(doc),
+      state_full: @current_state,
       hours: get_hours(doc),
       description: get_description(doc),
       promoter: get_promoter(doc),
       location: get_location(doc),
       vendor_info: get_vendor_info(doc)
     }
-    create_record(obj)
   end
 
-  def create_record(obj)
-    Event.create(obj)
+  def create_records(array)
+    array.each do |item| 
+      Event.create(item)
+    end
   end
 
   def returnMatchingPairsinDB()
@@ -69,7 +75,6 @@ class Event < ApplicationRecord
     STATES.each do |line|
       states << line.strip()
     end
-    binding.pry
     return states
   end
 
@@ -115,13 +120,15 @@ class Event < ApplicationRecord
     doc.css('div.three-fourths.text.hours').css('li').each do |item|
       day_of_week = item.text.split(': ')[0]
       hours = item.text.split(': ')[1]
-      result << { dayOfWeek: day_of_week, hours: hours }
+      result << { day_of_week: day_of_week, hours: hours }
     end
     return result
   end
 
   def get_description(doc)
-    return doc.at('div.one-fourth.first.label:contains("Description")').next_element.text
+    if (doc.at('div.one-fourth.first.label:contains("Description")'))
+      return doc.at('div.one-fourth.first.label:contains("Description")').next_element.text
+    end
   end
 
   def get_promoter(doc)
