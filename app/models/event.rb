@@ -1,4 +1,5 @@
 class Event < ApplicationRecord
+  STATES = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming']
   def start(states_selected = nil)
     if (states_selected)
       scrape(states_selected)
@@ -65,11 +66,10 @@ class Event < ApplicationRecord
 
   def get_US_states()
     states = []
-    File.open(Rails.root + 'app/assets/states.rb', "r") do |f|
-      f.each do |line|
-        states << line.strip()
-      end
+    STATES.each do |line|
+      states << line.strip()
     end
+    binding.pry
     return states
   end
 
