@@ -18,7 +18,7 @@
 
 function checkAllBoxes() {
   var list = document.getElementsByClassName("us_state");
-  for (var item of list) {
-    item.checked ? item.checked = false : item.checked = true;
+  for (var i = 0; i < list.length; i++) {
+    list[i].checked ? list[i].checked = false : list[i].checked = true;
   }
 }
