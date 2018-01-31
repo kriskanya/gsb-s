@@ -13,3 +13,12 @@
 //= require rails-ujs
 //= require turbolinks
 //= require_tree .
+
+
+
+function checkAllBoxes() {
+  var list = document.getElementsByClassName("us_state");
+  for (var item of list) {
+    item.checked ? item.checked = false : item.checked = true;
+  }
+}

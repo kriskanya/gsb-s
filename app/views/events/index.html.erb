@@ -1,9 +1,10 @@
 <h1>gun show trader</h1>
 
 <%= button_to 'clear database', { :controller => "events", :action => "clear_database" } %>
+<button onclick="checkAllBoxes()">check all boxes</button>
 <%= form_tag(events_scrape_path, method: 'post', :id => 'events-scrape') do %>
   <% @US_states.each do |state| %>
-    <%= check_box_tag "states[]", state %><%= link_to state, "##{state}" %>
+    <%= check_box_tag "states[]", state, false, class: 'us_state' %><%= link_to state, "##{state}" %>
   <% end %>
   <div>
     <%= button_to 'scrape', { :controller => "events", :action => "scrape" } %>
