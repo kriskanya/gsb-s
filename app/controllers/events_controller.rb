@@ -9,11 +9,13 @@ class EventsController < ApplicationController
 
   def scrape
     if (params[:states])
-      event = Event.new()
-      gun_shows_array = event.start(params[:states])
-      event.create_records(gun_shows_array)
+      Thread.new do
+        event = Event.new()
+        gun_shows_array = event.start(params[:states])
+        event.create_records(gun_shows_array)
+        redirect_to root_path
+      end
     end
-    redirect_to root_path
   end
 
   def clear_database
