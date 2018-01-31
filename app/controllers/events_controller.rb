@@ -13,12 +13,12 @@ class EventsController < ApplicationController
       gun_shows_array = event.start(params[:states])
       event.create_records(gun_shows_array)
     end
-    redirect_to events_path
+    redirect_to root_path
   end
 
   def clear_database
     Event.delete_all()
-    redirect_to events_path
+    redirect_to root_path
   end
 
   def checkEventEquality(index, parameter)
