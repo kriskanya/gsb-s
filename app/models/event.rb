@@ -8,15 +8,13 @@ class Event < ApplicationRecord
   end
 
   def scrape(states_selected)
-    gun_show_data = []
     get_all_gunshow_titles(states_selected).each do |gun_show_title|
       new_record = get_individual_gun_show_data(gun_show_title)
       if (gun_show_data.select { |d| d[:title] == new_record[:title] && d[:location] == new_record[:location] }.length == 0)
-        gun_show_data << new_record
+        create_record(new_record)
       end
       sleep 1
     end 
-    return gun_show_data
   end
 
   def get_all_gunshow_titles(states_selected)
@@ -51,10 +49,8 @@ class Event < ApplicationRecord
     }
   end
 
-  def create_records(array)
-    array.each do |item| 
-      Event.create(item)
-    end
+  def create_record(item)
+    Event.create(item)
   end
 
   def returnMatchingPairsinDB()

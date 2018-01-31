@@ -12,7 +12,6 @@ class EventsController < ApplicationController
       Thread.new do
         event = Event.new()
         gun_shows_array = event.start(params[:states])
-        event.create_records(gun_shows_array)
         redirect_to root_path
       end
     end
