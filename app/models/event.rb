@@ -23,6 +23,7 @@ class Event < ApplicationRecord
     require 'open-uri'
     gun_show_titles = []
     states_selected.each do |us_state|
+      us_state = us_state.gsub(' ', '-')
       doc = Nokogiri::HTML(open("https://gunshowtrader.com/gunshows/#{us_state}/").read)
       doc.css('a.event-link').each do |item|
         gun_show_titles << item.attr('href').split('gun-shows/')[1].gsub('/', '')
