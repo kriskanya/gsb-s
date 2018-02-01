@@ -1,9 +1,9 @@
 class Event < ApplicationRecord
   STATES = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming']
   STATES_ABBR = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY']
-  def start(states_selected = nil, starting_at = 0, ending_at = -1)
+  def start(states_selected = nil)
     if (states_selected)
-      scrape(states_selected[starting_at..ending_at])
+      scrape(states_selected)
     end
   end
 
@@ -11,11 +11,10 @@ class Event < ApplicationRecord
     gun_show_data = []
     get_all_gunshow_titles(states_selected).each do |gun_show_title|
       new_record = get_individual_gun_show_data(gun_show_title)
-      if (gun_show_data.select { |d| d[:title] == new_record[:title] && d[:location] == new_record[:location] }.length == 0)
+      if (!new_record.nil? && gun_show_data.select { |d| d[:title] == new_record[:title] && d[:location] == new_record[:location] }.length == 0)
         gun_show_data << new_record
         create_record(new_record)
       end
-      sleep 0.5
     end 
   end
 
@@ -28,7 +27,7 @@ class Event < ApplicationRecord
       if (url_exists(url_string))
         doc = Nokogiri::HTML(open(url_string).read)
         doc.css('a.event-link').each do |item|
-          gun_show_titles << item.attr('href').split('gun-shows/')[1].gsub('/', '')
+          gun_show_titles << item.attr('href').split('gun-shows/', 2)[1].gsub('/', '')
         end
       end
     end
@@ -47,10 +46,15 @@ class Event < ApplicationRecord
   end
 
   def get_individual_gun_show_data(gun_show_title)
+    require 'net/http'
     require 'open-uri'
-      url_string = "https://gunshowtrader.com/gun-shows/#{gun_show_title}/"
+    url_string = "https://gunshowtrader.com/gun-shows/#{gun_show_title}/"
+    uri = URI.parse(url_string)
+    if (Net::HTTP.get_response(uri).code != '200')
+      return nil
+    elsif (Net::HTTP.get_response(uri).code == '200')
+      doc = Nokogiri::HTML(open(url_string).read)
       if (url_exists(url_string))
-        doc = Nokogiri::HTML(open(url_string).read)
         state = get_state(doc)
         obj = {
           title: get_title(doc),
@@ -66,6 +70,7 @@ class Event < ApplicationRecord
           vendor_info: get_vendor_info(doc)
         }
       end
+    end
   end
 
   def create_record(item)

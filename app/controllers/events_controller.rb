@@ -8,18 +8,10 @@ class EventsController < ApplicationController
   end
 
   def scrape
-    half = (params[:states].length/2).ceil
-    if (params[:states])
-      Thread.new do
-        event = Event.new()
-        gun_shows_array = event.start(params[:states], 0, half)
-        redirect_to root_path
-      end
-      Thread.new do
-        event = Event.new()
-        gun_shows_array = event.start(params[:states], half, -1)
-        redirect_to root_path
-      end
+    Thread.new do
+      event = Event.new()
+      gun_shows_array = event.start(params[:states])
+      redirect_to root_path
     end
   end
 
