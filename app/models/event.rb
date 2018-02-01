@@ -23,33 +23,49 @@ class Event < ApplicationRecord
     require 'open-uri'
     gun_show_titles = []
     states_selected.each do |us_state|
-      us_state = us_state.gsub(' ', '-')
-      doc = Nokogiri::HTML(open("https://gunshowtrader.com/gunshows/#{us_state}/").read)
-      doc.css('a.event-link').each do |item|
-        gun_show_titles << item.attr('href').split('gun-shows/')[1].gsub('/', '')
+      us_state = us_state.gsub(' ', '-').downcase
+      url_string = "https://gunshowtrader.com/gunshows/#{us_state}/"
+      if (url_exists(url_string))
+        doc = Nokogiri::HTML(open(url_string).read)
+        doc.css('a.event-link').each do |item|
+          gun_show_titles << item.attr('href').split('gun-shows/')[1].gsub('/', '')
+        end
       end
     end
     # gun_show_titles = ['fort-oglethorpe-gun-show']
     return gun_show_titles
   end
 
+  def url_exists(url)
+    require 'net/http'
+    url = URI.parse(url)
+    req = Net::HTTP.new(url.host, url.port)
+    req.use_ssl = (url.scheme == 'https')
+    path = url.path if url.path.present?
+    res = req.request_head(path || '/')
+    return res.code != "404" # false if returns 404 - not found
+  end
+
   def get_individual_gun_show_data(gun_show_title)
     require 'open-uri'
-    doc = Nokogiri::HTML(open("https://gunshowtrader.com/gun-shows/#{gun_show_title}/").read)
-    state = get_state(doc)
-    obj = {
-      title: get_title(doc),
-      dates: get_dates(doc),
-      rating: get_rating(doc),
-      city: get_city(doc),
-      state: state,
-      state_full: get_state_full(state),
-      hours: get_hours(doc),
-      description: get_description(doc),
-      promoter: get_promoter(doc),
-      location: get_location(doc),
-      vendor_info: get_vendor_info(doc)
-    }
+      url_string = "https://gunshowtrader.com/gun-shows/#{gun_show_title}/"
+      if (url_exists(url_string))
+        doc = Nokogiri::HTML(open(url_string).read)
+        state = get_state(doc)
+        obj = {
+          title: get_title(doc),
+          dates: get_dates(doc),
+          rating: get_rating(doc),
+          city: get_city(doc),
+          state: state,
+          state_full: get_state_full(state),
+          hours: get_hours(doc),
+          description: get_description(doc),
+          promoter: get_promoter(doc),
+          location: get_location(doc),
+          vendor_info: get_vendor_info(doc)
+        }
+      end
   end
 
   def create_record(item)
