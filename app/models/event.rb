@@ -15,7 +15,7 @@ class Event < ApplicationRecord
         gun_show_data << new_record
         create_record(new_record)
       end
-      sleep 1
+      sleep 0.5
     end 
   end
 
