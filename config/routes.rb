@@ -4,4 +4,6 @@ Rails.application.routes.draw do
   resources :events, only: [:index]
   post "events/clear_database" => "events#clear_database"
   post "events/scrape" => "events#scrape"
+  get "events/export_csv" => "events#export_csv"
+  get "events/export_csv2" => "events#export_csv2"
 end
