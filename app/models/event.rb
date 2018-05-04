@@ -379,7 +379,8 @@ class Event < ApplicationRecord
   end
 
   def parse_location(obj)
-    puts 'parse location'
+    puts 'parse location 0'
+    puts obj
     require 'Indirizzo'
     a = Indirizzo::Address.new(obj[:location])
     
