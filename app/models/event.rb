@@ -383,6 +383,7 @@ class Event < ApplicationRecord
     puts obj
     require 'Indirizzo'
     a = Indirizzo::Address.new(obj[:location])
+    puts a
     
     puts 'parse_location 1'
     addr_number = /\d+/.match(a.text).to_s()
