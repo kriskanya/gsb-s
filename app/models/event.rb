@@ -383,15 +383,19 @@ class Event < ApplicationRecord
     require 'Indirizzo'
     a = Indirizzo::Address.new(obj[:location])
     
+    puts 'parse_location 1'
     addr_number = /\d+/.match(a.text).to_s()
     addr = nil
     
+    puts 'parse_location 2'
     if (addr_number != a.zip) 
       obj[:location_name] = a.text.split(addr_number)[0].strip()
       addr = a.text.split(addr_number)[1].strip()
     elsif (addr_number == a.zip)
       addr = a.text
     end
+    
+    puts 'parse_location 3'
     
     addr.split(' ').each_with_index do |s, i|
       if (s.include?(','))
@@ -404,9 +408,13 @@ class Event < ApplicationRecord
       end
     end
 
+    puts 'parse_location 4'
+    
     obj[:location_city] = a.city[0].split.map(&:capitalize).join(' ')
     obj[:location_state] = a.state
     obj[:location_zip] = a.zip
+    puts 'parse_location 5'
+    
     return obj
   end
 
