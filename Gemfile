@@ -31,7 +31,7 @@ gem 'jbuilder', '~> 2.5'
 # gem 'bcrypt', '~> 3.1.7'
 gem 'nokogiri'
 gem 'pry'
-gem 'Indirizzo', '~> 0.1.7'
+gem 'Indirizzo', require: "indirizzo"
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development

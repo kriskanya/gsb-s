@@ -180,7 +180,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  Indirizzo (~> 0.1.7)
+  Indirizzo
   byebug
   capybara (~> 2.13)
   coffee-rails (~> 4.2)
